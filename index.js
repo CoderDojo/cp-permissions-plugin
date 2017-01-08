@@ -9,7 +9,6 @@ module.exports = function (options) {
 
   //  Required params
   var config = require(options.config)();
-
   var addValidator = function (lib) {
     seneca.add({role: lib, cmd: 'check_permissions'},
       require('./lib/check_permissions'));
