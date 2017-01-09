@@ -4,6 +4,7 @@ seneca.use(require('..'), {
   config: __dirname + '/permissions-rules'});
 var _lab = require('lab');
 var _ = require('lodash');
+var async = require('async');
 var spy = require('sinon').spy;
 var conf = require('./permissions-rules')();
 var lab = exports.lab = _lab.script();
@@ -21,10 +22,11 @@ describe('cp-perms', function () {
   var actForAnybody = {role: 'cp-test', cmd: 'acting_as_free'};
   var actForAdult = {role: 'cp-test', cmd: 'acting_as_adult'};
   var actForPro = {role: 'cp-test', cmd: 'acting_as_pro'};
+  var actForSchyzo = {role: 'cp-test', cmd: 'acting_as_schyzo'};
+
   var expectedResult = {'acting': 'as_normal'};
   var customValHandler = function (args, done) {
     var toTest = args.toTest;
-    console.log('tested', args.toTest);
     return done(null, {'allowed': toTest === 'imabanana'? true: false});
   };
   var spied = spy(customValHandler);
@@ -35,7 +37,7 @@ describe('cp-perms', function () {
     done();
   });
 
-  it('should create one act per "role" domain', function (done) {
+  it.skip('should create one act per "role" domain', function (done) {
     // We need to encapsulate w/ ready to ensure acts are added to seneca's list
     seneca.ready(function(){
       var acts = seneca.list();
@@ -91,6 +93,32 @@ describe('cp-perms', function () {
     });
   });
 
+  it('should allow a list of profiles', function (done) {
+    var basicUser = function (next) {
+      seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSchyzo.cmd, user: {roles: ['basic-user'], initUserType: ['parent']}, toTest: 'imabanana'}, function (err, allowance) {
+        if (err) return done(err);
+        expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
+        next();
+      });
+    };
+    var cdfAdmin = function (next) {
+      seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSchyzo.cmd, user: {roles: ['cdf-admin']}}, function (err, allowance) {
+        if (err) return done(err);
+        expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
+        next();
+      });
+    };
+    var mentor = function (next) {
+      seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSchyzo.cmd, user: {roles: ['basic-user'], initUserType: ['mentor']}, toTest: 'imabanana'}, function (err, allowance) {
+        if (err) return done(err);
+        expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
+        next();
+      });
+    };
+    async.waterfall([basicUser, cdfAdmin, mentor], done);
+
+  });
+
   /***** ERROR HANDLING ***/
 
   // TODO : test for missing conf
@@ -103,20 +131,29 @@ describe('cp-perms', function () {
     });
   });
 
-  // TODO
-  // it('should be returning errors when passed params are in the wrong format', function (done) {
-  //   seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSimpleMinded.cmd, user: {roles: 'basic-userqsd'}}, function (err, allowance) {
-  //     expect(allowance).to.satisfy(isValidFormat);
-  //     done();
-  //   });
-  // });
-  //
-  // // TODO
-  // it('should be returning errors when passed params are in the wrong format', function (done) {
-  //   seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'parent'}}, function (err, allowance) {
-  //     expect(allowance).to.satisfy(isValidFormat);
-  //     done();
-  //   });
-  // });
+  it('should not be returning errors when passed params are in the wrong format', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSimpleMinded.cmd, user: {roles: 'basic-user'}}, function (err, allowance) {
+      expect(allowance).to.satisfy(isValidFormat);
+      expect(allowance).to.be.deep.equal({allowed: true});
+      done();
+    });
+  });
+
+  // Since everything is casted to array, we can allow ourselves to simply send a sigle userType
+  it('should be allowing a string instead of an array with a proper usertype', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'parent'}}, function (err, allowance) {
+      expect(allowance).to.satisfy(isValidFormat);
+      expect(allowance).to.be.deep.equal({allowed: true});
+      done();
+    });
+  });
+
+  it('should be refusing when using the usertype as a string instead of an array with a wrong usertype', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'attendee-o13'}}, function (err, allowance) {
+      expect(allowance).to.satisfy(isValidFormat);
+      expect(allowance).to.be.deep.equal({allowed: {status: 403}});
+      done();
+    });
+  });
 
 })
