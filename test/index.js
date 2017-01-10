@@ -27,7 +27,7 @@ describe('cp-perms', function () {
   var expectedResult = {'acting': 'as_normal'};
   var customValHandler = function (args, done) {
     var toTest = args.toTest;
-    return done(null, {'allowed': toTest === 'imabanana'? true: false});
+    return done(null, {'allowed': toTest === 'imabanana'});
   };
   var spied = spy(customValHandler);
   seneca.add({role: 'cp-test', cmd: 'customVal'}, spied);
@@ -37,13 +37,12 @@ describe('cp-perms', function () {
     done();
   });
 
-  it.skip('should create one act per "role" domain', function (done) {
+  it('should create one act per "role" domain', function (done) {
     // We need to encapsulate w/ ready to ensure acts are added to seneca's list
     seneca.ready(function(){
       var acts = seneca.list();
       var filtered = _.filter(acts, {role: 'cp-test'});
-      // +1 = customVal
-      expect(filtered.length + 1).to.be.deep.equal(_.keys(conf['cp-test']).length);
+      expect(filtered.length).to.be.deep.equal(_.keys(conf).length + 1); // 1 = number of custom validators
       done();
     });
   });
@@ -78,7 +77,7 @@ describe('cp-perms', function () {
   });
 
   // TODO : seems to fail when used w/ others
-  it.skip('should refuse with customValidators', function (done) {
+  it('should refuse with customValidators', function (done) {
     seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForPro.cmd, user: {roles: ['basic-user']}}, function (err, allowance) {
       expect(spied.callCount).to.be.equal(1);
       expect(allowance).to.be.deep.equal({allowed: {status: 401}}).and.to.satisfy(isValidFormat);
