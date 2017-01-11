@@ -1,7 +1,7 @@
 module.exports = function () {
   return {
       roles: ['none', 'basic-user', 'cdf-admin'],
-      userTypes: ['attendee-u13', 'attendee-o13', 'parent', 'mentor'],
+      userTypes: ['attendee-u13', 'attendee-o13', 'parent-guardian', 'mentor'],
       roleHierarchy: {
         'cdf-admin': {
           'basic-user': {
@@ -12,7 +12,7 @@ module.exports = function () {
       userTypeHierarchy: {
         'basic-user': {
           'champion': [{
-            'parent': [
+            'parent-guardian': [
               {'attendee-o13': {}},
               {'attendee-u13': {}}
               ]
