@@ -94,7 +94,7 @@ describe('cp-perms', function () {
 
   it('should allow a list of profiles', function (done) {
     var basicUser = function (next) {
-      seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSchyzo.cmd, user: {roles: ['basic-user'], initUserType: ['parent']}, toTest: 'imabanana'}, function (err, allowance) {
+      seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSchyzo.cmd, user: {roles: ['basic-user'], initUserType: ['parent-guardian']}, toTest: 'imabanana'}, function (err, allowance) {
         if (err) return done(err);
         expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
         next();
@@ -140,7 +140,7 @@ describe('cp-perms', function () {
 
   // Since everything is casted to array, we can allow ourselves to simply send a sigle userType
   it('should be allowing a string instead of an array with a proper usertype', function (done) {
-    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'parent'}}, function (err, allowance) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'parent-guardian'}}, function (err, allowance) {
       expect(allowance).to.satisfy(isValidFormat);
       expect(allowance).to.be.deep.equal({allowed: true});
       done();
