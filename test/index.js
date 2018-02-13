@@ -24,6 +24,7 @@ describe('cp-perms', function () {
   var actForPro = {role: 'cp-test', cmd: 'acting_as_pro'};
   var actForSchyzo = {role: 'cp-test', cmd: 'acting_as_schyzo'};
   var actForCrazy = {role: 'cp-test', cmd: 'acting_as_crazy'};
+  var actUnderCtrl = {role: 'cp-test', ctrl: 'acting_under_ctrl', cmd: 'acting_as_normal_under_ctrl'};
 
   var expectedResult = {'acting': 'as_normal'};
   var customValHandler = function (args, done) {
@@ -210,6 +211,13 @@ describe('cp-perms', function () {
     seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: 'attendee-o13'}}, function (err, allowance) {
       expect(allowance).to.satisfy(isValidFormat);
       expect(allowance).to.be.deep.equal({allowed: {status: 403}});
+      done();
+    });
+  });
+
+  it('should allow basic-user under a ctrl', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actUnderCtrl.cmd, params: { ctrl: actUnderCtrl.ctrl }, user: {roles: ['basic-user']}}, function (err, allowance) {
+      expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
       done();
     });
   });
