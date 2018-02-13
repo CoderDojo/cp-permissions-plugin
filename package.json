@@ -1,6 +1,6 @@
 {
   "name": "cp-permissions-plugin",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Handle permissions of users with a configuration-oriented behavior",
   "main": "index.js",
   "repository": {
@@ -8,7 +8,7 @@
     "url": "https://github.com/coderdojo/cp-permissions-plugin"
   },
   "scripts": {
-    "test": "lab test/index.js -r console -v -m 3000 -c -t 80"
+    "test": "lab test/*.spec.js -r console -v -m 3000 -c -t 80"
   },
   "keywords": [
     "senecajs",

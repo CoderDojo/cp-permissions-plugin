@@ -5,7 +5,8 @@ seneca.use(require('..'), {
 var _lab = require('lab');
 var _ = require('lodash');
 var async = require('async');
-var spy = require('sinon').spy;
+var sinon = require('sinon');
+var spy = sinon.spy;
 var conf = require('./permissions-rules')();
 var lab = exports.lab = _lab.script();
 var describe = lab.describe;
@@ -14,17 +15,18 @@ var utils = require('./utils');
 var isValidFormat = utils.isValidFormat;
 var expect = require('code').expect;
 
+var actForSimpleMinded = {role: 'cp-test', cmd: 'acting_as_normal'};
+var actForAnybody = {role: 'cp-test', cmd: 'acting_as_free'};
+var actForAdult = {role: 'cp-test', cmd: 'acting_as_adult'};
+var actForPro = {role: 'cp-test', cmd: 'acting_as_pro'};
+var actForSchyzo = {role: 'cp-test', cmd: 'acting_as_schyzo'};
+var actForCrazy = {role: 'cp-test', cmd: 'acting_as_crazy'};
+var actUnderCtrl = {role: 'cp-test', ctrl: 'acting_under_ctrl', cmd: 'acting_as_normal_under_ctrl'};
+
 process.setMaxListeners(0);
 
 
 describe('cp-perms', function () {
-  var actForSimpleMinded = {role: 'cp-test', cmd: 'acting_as_normal'};
-  var actForAnybody = {role: 'cp-test', cmd: 'acting_as_free'};
-  var actForAdult = {role: 'cp-test', cmd: 'acting_as_adult'};
-  var actForPro = {role: 'cp-test', cmd: 'acting_as_pro'};
-  var actForSchyzo = {role: 'cp-test', cmd: 'acting_as_schyzo'};
-  var actForCrazy = {role: 'cp-test', cmd: 'acting_as_crazy'};
-  var actUnderCtrl = {role: 'cp-test', ctrl: 'acting_under_ctrl', cmd: 'acting_as_normal_under_ctrl'};
 
   var expectedResult = {'acting': 'as_normal'};
   var customValHandler = function (args, done) {
@@ -222,4 +224,4 @@ describe('cp-perms', function () {
     });
   });
 
-})
+});

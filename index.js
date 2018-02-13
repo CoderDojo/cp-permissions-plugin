@@ -2,6 +2,7 @@
 
 var _ = require('lodash');
 var async = require('async');
+var checkProfiles = require('./lib/check_profiles');
 
 module.exports = function (options) {
   var seneca = this;
@@ -23,3 +24,5 @@ module.exports = function (options) {
     }
   };
 };
+
+module.exports.checkProfiles = checkProfiles;
