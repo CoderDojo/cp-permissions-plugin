@@ -26,6 +26,11 @@ module.exports = function () {
           userType: 'parent-guardian'
         }
       ],
+      'acting_as_children': [
+        {
+          userType: 'attendee-o13'
+        },
+      ],
       'acting_as_pro': [
         {
           role: 'basic-user',

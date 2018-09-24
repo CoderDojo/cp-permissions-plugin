@@ -18,6 +18,7 @@ var expect = require('code').expect;
 var actForSimpleMinded = {role: 'cp-test', cmd: 'acting_as_normal'};
 var actForAnybody = {role: 'cp-test', cmd: 'acting_as_free'};
 var actForAdult = {role: 'cp-test', cmd: 'acting_as_adult'};
+var actForChildren = {role: 'cp-test', cmd: 'acting_as_children'};
 var actForPro = {role: 'cp-test', cmd: 'acting_as_pro'};
 var actForSchyzo = {role: 'cp-test', cmd: 'acting_as_schyzo'};
 var actForCrazy = {role: 'cp-test', cmd: 'acting_as_crazy'};
@@ -64,6 +65,14 @@ describe('cp-perms', function () {
       done();
     });
   });
+  
+  it('should allow the lowest user-type', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForChildren.cmd, user: {roles: ['basic-user'], initUserType: ['attendee-o13'] }}, function (err, allowance) {
+      expect(allowance).to.be.deep.equal({allowed: true}).and.to.satisfy(isValidFormat);
+      done();
+    });
+  });
+
 
   it('should allow basic-user', function (done) {
     seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSimpleMinded.cmd, user: {roles: ['basic-user']}}, function (err, allowance) {
@@ -184,8 +193,16 @@ describe('cp-perms', function () {
 
   // TODO : test for missing conf
   // Apart from seneca errors, like act not found, or config errors (missing conf)
-  it('should be not returning errors when userType does not exist', function (done) {
+  it('should be not returning errors when role does not exist', function (done) {
     seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForSimpleMinded.cmd, user: {roles: ['basic-userqsd']}}, function (err, allowance) {
+      expect(allowance).to.satisfy(isValidFormat);
+      expect(allowance).to.be.deep.equal({allowed: {status: 403}});
+      done();
+    });
+  });
+  
+  it('should be not returning errors when userType does not exist', function (done) {
+    seneca.act({role: 'cp-test', cmd: 'check_permissions', act: actForAdult.cmd, user: {initUserType: ['monster-munch']}}, function (err, allowance) {
       expect(allowance).to.satisfy(isValidFormat);
       expect(allowance).to.be.deep.equal({allowed: {status: 403}});
       done();
